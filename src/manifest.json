@@ -1,0 +1,11 @@
+{
+  "manifest_version": 3,
+  "name": "Sync GL to Readwise",
+  "version": "0.0.1",
+  "description": "A web extension that allows you to sync your annotations from Gospel Library to Readwise",
+  "action": {
+    "default_popup": "popup.html"
+  },
+  "host_permissions": ["https://*.churchofjesuschrist.org/"],
+  "permissions": ["storage"]
+}
