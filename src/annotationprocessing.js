@@ -65,12 +65,12 @@ function wordOffsetToIndex(wordsAndSeparators, wordOffset, initialIndex = 0, ini
 function htmlToMarkdownWithPlaceholders(html) {
   return turndown(html, {
     // filter out <sup> tags
-    // we include a 🦶 placeholder here (filtered out later) with spaces around it so that each footnote will count
-    // as a separate word
+    // we include a 🦶 placeholder here (filtered out later) with separators around it so that
+    // each footnote will count as a separate word
     // (lol one day this will show up in an actual highlight and this will break)
     'no-sups': {
       filter: 'sup',
-      replacement: () => ' 🦶 ',
+      replacement: () => '🌌🦶🌌',
     },
     // filter out footnote links
     'no-footnote-links': {
@@ -97,13 +97,8 @@ function htmlToMarkdownWithPlaceholders(html) {
 }
 
 function withoutPlaceholders(md) {
-  // we have to be lenient here in case the footnote is at the beginning or end of a highlight,
-  // in which case it will be missing its leading or trailing space respectively.
-  // TODO this will cause problems if a footnote is like this<sup>1</sup>, with non-space characters
-  // on both sides, because it'll get replaced with a space in the result: "like this ,". Fortunately,
-  // most uses of footnotes don't seem to do that
   const cleaned = md
-    .replaceAll(/ *🦶 */g, ' ')
-    .replaceAll('🌌',)
+    .replaceAll('🦶', '')
+    .replaceAll('🌌', '')
   return cleaned
 }
