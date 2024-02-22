@@ -9,12 +9,24 @@
     body {
       min-width: 400px;
       min-height: 400px;
+      accent-color: #4169e1;
+    }
+
+    pre {
+      white-space: pre-wrap;
+      max-height: 500px;
+      max-width: 500px;
+      overflow: auto;
     }
   </style>
 </head>
 
 <body>
+  <script async src="./deps/turndown.js"></script>
   <script type="module" src="./popup.js"></script>
+  <header>
+    <a href="" target="_blank">Open in new tab</a>
+  </header>
   <p>
     Use the buttons below to load your Gospel Library annotations and then sync them to Readwise.
   </p>
@@ -23,6 +35,7 @@
   <div>
     <button>Check for annotations</button>
     <button>Sync to Readwise</button>
+    <button>Clear cache</button>
   </div>
   <p>Links:</p>
   <ul>
