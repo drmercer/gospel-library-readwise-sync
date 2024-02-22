@@ -59,7 +59,7 @@ function getAllHighlightUris(annotations) {
 // ensure they count as separate words.
 // NOTE: the capturing group is important, it lets us split on this regex and keep the separators in the resulting array
 // TODO if any other word separators are discovered, add them here
-const SeparatorRegex = /([🌌\s—-]+)/g;
+const SeparatorRegex = /([🌌\s—–-]+)/g;
 
 function assembleHighlights(annotations, contents) {
   return annotations.map(a => {
@@ -92,8 +92,6 @@ function assembleHighlights(annotations, contents) {
       .join('\n\n');
     return {
       locationUri,
-      highlightStart,
-      highlightEnd,
       fullMd,
       highlightMd,
     }
