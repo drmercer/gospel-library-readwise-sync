@@ -1,5 +1,5 @@
 import { getAnnotations, getContents } from "./annotationsapi.js";
-import { htmlToMarkdown } from "./turndownwrapper.js";
+import { htmlToMarkdownWithFootnotePlaceholders, withoutFootnotePlaceholders } from "./turndownwrapper.js";
 
 const [output] = document.querySelectorAll('pre');
 const [check, sync, clearCache] = document.querySelectorAll('button');
@@ -56,8 +56,9 @@ function getAllHighlightUris(annotations) {
 }
 
 // words can be split by spaces or dashes
+// NOTE: the capturing group is important, it lets us split on this regex and keep the separators in the resulting array
 // TODO if any other word separators are discovered, add them here
-const SeparatorRegex = /(\s+|—|-)/g;
+const SeparatorRegex = /([\s—-]+)/g;
 
 function assembleHighlights(annotations, contents) {
   return annotations.map(a => {
@@ -67,15 +68,15 @@ function assembleHighlights(annotations, contents) {
     const mdParts = contentObjs
       .flatMap(c => c.content)
       .map(c => c.markup)
-      .map(htmlToMarkdown);
+      .map(htmlToMarkdownWithFootnotePlaceholders);
     const fullMd = mdParts
+      .map(withoutFootnotePlaceholders)
       .join('\n\n');
     const highlightStart = highlights[0]?.startOffset;
     const highlightEnd = highlights[highlights.length - 1]?.endOffset;
     const highlightMd = mdParts.map((part, i) => {
       const h = highlights[i];
       // highlights are stored as word offsets in the passage (or -1 for the start or end)
-      // TODO the offsets count footnotes as words... but we filter out the footnotes before this point... how to fix
       const startOffset = Math.max(h.startOffset - 1, 0); // h.startOffset is 1-indexed
       const endOffset = h.endOffset == -1 ? Number.POSITIVE_INFINITY : h.endOffset;
       // split by words (keeping the separators because of the capturing group)
@@ -98,9 +99,12 @@ function assembleHighlights(annotations, contents) {
         }
       }
       const endIndex = j;
-      const highlightPart = parts.slice(startIndex, endIndex).join('').trim();
+      const highlightPart = parts.slice(startIndex, endIndex).join('');
       return highlightPart;
-    }).join('\n\n');
+    })
+      .map(withoutFootnotePlaceholders)
+      .map(s => s.trim())
+      .join('\n\n');
     return {
       locationUri,
       highlightStart,
