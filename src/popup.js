@@ -1,5 +1,5 @@
 import { getAnnotations, getContents } from "./annotationsapi.js";
-import { htmlToMarkdownWithFootnotePlaceholders, withoutFootnotePlaceholders } from "./turndownwrapper.js";
+import { htmlToMarkdownWithPlaceholders, withoutPlaceholders } from "./turndownwrapper.js";
 
 const [output] = document.querySelectorAll('pre');
 const [check, sync, clearCache] = document.querySelectorAll('button');
@@ -55,10 +55,11 @@ function getAllHighlightUris(annotations) {
     .map(h => h.uri);
 }
 
-// words can be split by spaces or dashes
+// words can be split by spaces or dashes. The 🌌 is placed around links by htmlToMarkdownWithPlaceholders() to
+// ensure they count as separate words.
 // NOTE: the capturing group is important, it lets us split on this regex and keep the separators in the resulting array
 // TODO if any other word separators are discovered, add them here
-const SeparatorRegex = /([\s—-]+)/g;
+const SeparatorRegex = /([🌌\s—-]+)/g;
 
 function assembleHighlights(annotations, contents) {
   return annotations.map(a => {
@@ -68,9 +69,9 @@ function assembleHighlights(annotations, contents) {
     const mdParts = contentObjs
       .flatMap(c => c.content)
       .map(c => c.markup)
-      .map(htmlToMarkdownWithFootnotePlaceholders);
+      .map(htmlToMarkdownWithPlaceholders);
     const fullMd = mdParts
-      .map(withoutFootnotePlaceholders)
+      .map(withoutPlaceholders)
       .join('\n\n');
     const highlightStart = highlights[0]?.startOffset;
     const highlightEnd = highlights[highlights.length - 1]?.endOffset;
@@ -81,28 +82,12 @@ function assembleHighlights(annotations, contents) {
       const endOffset = h.endOffset == -1 ? Number.POSITIVE_INFINITY : h.endOffset;
       // split by words (keeping the separators because of the capturing group)
       const parts = part.split(SeparatorRegex);
-      let offset = 0;
-      let j = 0;
-      while (offset < startOffset) {
-        const p = parts[j++];
-        if (p.match(SeparatorRegex)?.[0] !== p) {
-          // only count it if it's not a separator
-          offset++;
-        }
-      }
-      const startIndex = j;
-      while (offset < endOffset && j < parts.length) {
-        const p = parts[j++];
-        if (p.match(SeparatorRegex)?.[0] !== p) {
-          // only count it if it's not a separator
-          offset++;
-        }
-      }
-      const endIndex = j;
+      const startIndex = wordOffsetToIndex(parts, startOffset);
+      const endIndex = wordOffsetToIndex(parts, endOffset, startIndex, startOffset);
       const highlightPart = parts.slice(startIndex, endIndex).join('');
       return highlightPart;
     })
-      .map(withoutFootnotePlaceholders)
+      .map(withoutPlaceholders)
       .map(s => s.trim())
       .join('\n\n');
     return {
@@ -113,6 +98,27 @@ function assembleHighlights(annotations, contents) {
       highlightMd,
     }
   })
+}
+
+function wordOffsetToIndex(wordsAndSeparators, wordOffset, initialIndex = 0, initialOffset = 0) {
+  let offset = initialOffset;
+  let index = initialIndex;
+  let inLink = false;
+  while (offset < wordOffset && index < wordsAndSeparators.length) {
+    const p = wordsAndSeparators[index++];
+    if (!inLink && p.match(SeparatorRegex)?.[0] !== p) {
+      // only count it if it's not a separator
+      offset++;
+    }
+    // don't count link URLs as multiple words
+    if (p.includes('](')) {
+      inLink = true;
+    }
+    if (inLink && p.includes(')')) {
+      inLink = false;
+    }
+  }
+  return index;
 }
 
 function prettyPrint(x) {
