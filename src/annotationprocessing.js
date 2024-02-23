@@ -72,26 +72,16 @@ function htmlToMarkdownWithPlaceholders(html) {
       filter: 'sup',
       replacement: () => '🌌🦶🌌',
     },
-    // filter out footnote links
-    'no-footnote-links': {
-      filter: (node) => {
-        return (
-          node.nodeName === 'A' &&
-          node.getAttribute('href')?.startsWith('#')
-        )
-      },
-      replacement: (content) => content,
-    },
-    // for other links, add a fake word separator at the end because that's how word counting works
+    // for links, add fake word separators around them, because that's how word counting works.
+    // also filter out footnote links
     'add-fake-word-separator-after-links': {
-      filter: (node) => {
-        return (
-          node.nodeName === 'A' &&
-          !!node.getAttribute('href') &&
-          !node.getAttribute('href')?.startsWith('#')
-        )
+      filter: 'a',
+      replacement: (content, node) => {
+        const href = node.getAttribute('href');
+        const isFootnote = href?.startsWith('#');
+        const md = (isFootnote || !href) ? content : `[${content}](${href})`;
+        return `🌌${md}🌌`;
       },
-      replacement: (content, node) => `🌌[${content}](${node.getAttribute('href')})🌌`,
     }
   });
 }
