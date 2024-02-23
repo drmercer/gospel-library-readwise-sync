@@ -26,7 +26,7 @@ export function assembleHighlights(annotations, contents) {
       // split by words (keeping the separators because of the capturing group)
       const parts = part.split(SeparatorRegex);
       const startIndex = wordOffsetToIndex(parts, startOffset);
-      const endIndex = wordOffsetToIndex(parts, endOffset, startIndex, startOffset);
+      const endIndex = wordOffsetToIndex(parts, endOffset);
       const highlightPart = parts.slice(startIndex, endIndex).join('');
       return highlightPart;
     })
@@ -41,9 +41,9 @@ export function assembleHighlights(annotations, contents) {
   })
 }
 
-function wordOffsetToIndex(wordsAndSeparators, wordOffset, initialIndex = 0, initialOffset = 0) {
-  let offset = initialOffset;
-  let index = initialIndex;
+function wordOffsetToIndex(wordsAndSeparators, wordOffset) {
+  let offset = 0;
+  let index = 0;
   let inLink = false;
   while (offset < wordOffset && index < wordsAndSeparators.length) {
     const p = wordsAndSeparators[index++];
