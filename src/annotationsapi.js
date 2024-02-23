@@ -1,3 +1,5 @@
+import { chunks } from './utils/array.js';
+
 /**
  * Functions for calling the "Annotations" API used by Gospel Library.
  *
@@ -94,21 +96,22 @@ export async function getAnnotations() {
  * ```
  */
 export async function getContents(uris, log) {
-  const BatchSize = 20; // seems to max out at 155, strangely, but we use a smaller number to be a good citizen
-  let remaining = [...new Set(uris)]; // filter out duplicates
-  let i = 1;
+  const BatchSize = 50; // seems to max out at 155, strangely, but we use a smaller number to be a good citizen
   const result = {};
-  while (remaining.length > 0) {
-    const batch = remaining.splice(0, BatchSize); // remove [BatchSize] elements from the front of the array
+  let i = 1; // for logging
+  let first = true;
+  // use new Set(...) to filter out duplicates
+  for (const batch of chunks([...new Set(uris)], BatchSize)) {
+    if (!first) {
+      // add a delay between requests to be a good citizen
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+    } else {
+      first = false;
+    }
 
     log?.(`Getting contents of batch ${i++}, size ${batch.length}...`);
     const batchResult = await getContentsInner(batch);
     Object.assign(result, batchResult);
-
-    if (remaining.length > 0) {
-      // add a delay between requests to be a good citizen
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-    }
   }
   return result;
 }
