@@ -6,6 +6,8 @@
  * @module
  */
 
+import { debugRes } from './utils/debug.js';
+
 /**
  * @returns A promise resolving with a list of the user's Gospel Library annotations.
  *
@@ -111,13 +113,4 @@ export async function getContents(uris) {
     // TODO examine error codes and return a more descriptive error
     throw new Error(`Failed to load contents. ${await debugRes(res)}`);
   }
-}
-
-async function debugRes(res) {
-  let txt = `Status: ${res.status}`;
-  try {
-    txt += ` Text: ${await res.text()}`;
-  } catch { }
-  txt += ` URL: ${res.url}`
-  return txt;
 }

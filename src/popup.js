@@ -1,30 +1,54 @@
 import { assembleHighlights } from "./annotationprocessing.js";
 import { getAnnotations, getContents } from "./annotationsapi.js";
+import { putHighlights } from "./readwise/api.js";
 import { chunks } from "./utils/array.js";
 
 const [output] = document.querySelectorAll('pre');
-const [check, sync, clearCache] = document.querySelectorAll('button');
+const [download, upload, changeReadwiseToken, clearCache] = document.querySelectorAll('button');
 
 const ContentsCacheKey = 'CachedContents'
+const ReadwiseTokenKey = 'ReadwiseToken'
+
+let highlights = [];
 
 output.textContent = 'Hello, world!';
-check.onclick = async () => {
+download.onclick = async () => {
   output.textContent = '';
   try {
-    println(`Loading annotations...`);
+    println(`Downloading highlights...`);
     const annotations = (await getAnnotations()).slice(100);
     const contents = await fetchContents(annotations);
     println(`Assembling highlights...`);
-    const highlights = assembleHighlights(annotations, contents);
+    highlights = assembleHighlights(annotations, contents);
     println(highlights);
   } catch (err) {
-    console.error('Failed to check annotations', err);
-    println('Failed to check annotations', String(err));
+    console.error('Failed to download highlights', err);
+    println('Failed to download highlights', String(err));
   }
 }
-sync.onclick = () => {
+upload.onclick = async () => {
   output.textContent = '';
-  println('TODO sync');
+  try {
+    const hs = highlights.slice(0, 10);
+    if (!hs.length) {
+      println('No highlights to upload!');
+      return;
+    }
+    println(`Syncing ${hs.length} highlights to readwise...`);
+    const accessToken = getReadwiseAccessToken();
+    await putHighlights(accessToken, hs.map(h => ({
+      highlight_url: 'https://glsync.danmercer.net/annotation/' + encodeURIComponent(h.id), // this lets us dedupe by annotation ID
+      text: h.highlightMd,
+      source_url: h.locationUri,
+      note: h.noteMd,
+    })))
+  } catch (err) {
+    console.error('Failed to upload highlights', err);
+    println('Failed to upload highlights', String(err));
+  }
+}
+changeReadwiseToken.onclick = () => {
+  promptForReadwiseToken();
 }
 clearCache.onclick = () => {
   output.textContent = '';
@@ -56,7 +80,7 @@ async function fetchContents(annotations) {
       first = false;
     }
 
-    println(`Getting contents of batch ${i++}, size ${batch.length}...`);
+    println(`Getting source texts (batch ${i++}, size ${batch.length})...`);
     const batchResult = await getContents(batch);
     // update object and cache
     Object.assign(contents, batchResult);
@@ -76,4 +100,16 @@ function println(...xs) {
     output.textContent += val + ' ';
   }
   output.textContent += '\n';
+}
+
+function getReadwiseAccessToken() {
+  if (!localStorage.getItem(ReadwiseTokenKey)) {
+    promptForReadwiseToken();
+  }
+  return localStorage.getItem(ReadwiseTokenKey);
+}
+
+function promptForReadwiseToken() {
+  const token = prompt('Enter your Readwise access token');
+  localStorage.setItem(ReadwiseTokenKey, token);
 }
