@@ -8,37 +8,51 @@ const SeparatorRegex = /([🌌\s—–-]+)/g;
 
 export function assembleHighlights(annotations, contents) {
   return annotations.map(a => {
-    const highlights = a?.highlights ?? [];
-    const contentObjs = highlights.map(h => contents[h.uri]);
-    const locationUri = contentObjs[0] ? 'https://www.churchofjesuschrist.org/study' + contentObjs[0].referenceURI : undefined;
-    const mdParts = contentObjs
-      .flatMap(c => c.content)
-      .map(c => c.markup)
-      .map(htmlToMarkdownWithPlaceholders);
-    const fullMd = mdParts
-      .map(withoutPlaceholders)
-      .join('\n\n');
-    const highlightMd = mdParts.map((part, i) => {
-      const h = highlights[i];
-      // highlights are stored as word offsets in the passage (or -1 for the start or end)
-      const startOffset = Math.max(h.startOffset - 1, 0); // h.startOffset is 1-indexed
-      const endOffset = h.endOffset == -1 ? Number.POSITIVE_INFINITY : h.endOffset;
-      // split by words (keeping the separators because of the capturing group)
-      const parts = part.split(SeparatorRegex);
-      const startIndex = wordOffsetToIndex(parts, startOffset);
-      const endIndex = wordOffsetToIndex(parts, endOffset);
-      const highlightPart = parts.slice(startIndex, endIndex).join('');
-      return highlightPart;
-    })
-      .map(withoutPlaceholders)
-      .map(s => s.trim())
-      .join('\n\n');
-    return {
-      locationUri,
-      fullMd,
-      highlightMd,
+    try {
+      const highlights = a?.highlights ?? [];
+      const contentObjs = highlights.map(h => {
+        const c = contents[h.uri];
+        if (!c) {
+          console.error(`Missing contents for URI '${h.uri}'`, contents);
+          throw new Error(`Missing contents for URI '${h.uri}'`)
+        }
+        return c
+      });
+      const locationUri = contentObjs[0] ? 'https://www.churchofjesuschrist.org/study' + contentObjs[0].referenceURI : undefined;
+      const mdParts = contentObjs
+        .flatMap(c => c.content)
+        .map(c => c.markup)
+        .map(htmlToMarkdownWithPlaceholders);
+      const fullMd = mdParts
+        .map(withoutPlaceholders)
+        .join('\n\n');
+      const highlightMd = mdParts.map((part, i) => {
+        const h = highlights[i];
+        // highlights are stored as word offsets in the passage (or -1 for the start or end)
+        const startOffset = Math.max(h.startOffset - 1, 0); // h.startOffset is 1-indexed
+        const endOffset = h.endOffset == -1 ? Number.POSITIVE_INFINITY : h.endOffset;
+        // split by words (keeping the separators because of the capturing group)
+        const parts = part.split(SeparatorRegex);
+        const startIndex = wordOffsetToIndex(parts, startOffset);
+        const endIndex = wordOffsetToIndex(parts, endOffset);
+        const highlightPart = parts.slice(startIndex, endIndex).join('');
+        return highlightPart;
+      })
+        .map(withoutPlaceholders)
+        .map(s => s.trim())
+        .join('\n\n');
+      return {
+        locationUri,
+        fullMd,
+        highlightMd,
+      }
+    } catch (err) {
+      // possibly a missing URI, if content was moved. Not sure how to recover from that. (😢)
+      const uri = a.uri ?? a.highlights?.[0]?.uri ?? 'unknown'
+      console.error(`Failed to assemble highlight on ${uri}`, a, err);
+      return undefined;
     }
-  })
+  }).filter(h => !!h) // filter out errors
 }
 
 function wordOffsetToIndex(wordsAndSeparators, wordOffset) {
