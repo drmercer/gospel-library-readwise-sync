@@ -4,38 +4,29 @@ import { getAnnotations, getContents } from "./annotationsapi.js";
 const [output] = document.querySelectorAll('pre');
 const [check, sync, clearCache] = document.querySelectorAll('button');
 
-let lastUpdatedTime = new Date("2023-01-01T00:00:00.000Z")
-
-const CacheKey = 'Cache'
+const ContentsCacheKey = 'CachedContents'
 
 output.textContent = 'Hello, world!';
 check.onclick = async () => {
   output.textContent = '';
   try {
-    if (!localStorage.getItem(CacheKey)) {
-      println(`Loading annotations...`);
-      const annotations = await getAnnotations();
-      const annotationsToSync = annotations.filter(a => {
-        return new Date(a.lastUpdated) > lastUpdatedTime;
-      })
-      const uris = getAllHighlightUris(annotationsToSync);
+    println(`Loading annotations...`);
+    const annotations = (await getAnnotations()).slice(100);
+    // TODO fetch contents for any new annotations (store last updated time)
+    if (!localStorage.getItem(ContentsCacheKey)) {
+      const uris = getAllHighlightUris(annotations);
       println(`Loading contents for ${uris.length} URIs...`);
       const contents = await getContents(uris, println);
-      localStorage.setItem(CacheKey, JSON.stringify({
-        annotationsToSync,
-        contents,
-      }));
+      localStorage.setItem(ContentsCacheKey, JSON.stringify(contents));
     } else {
-      println(`Using cached data`);
+      println(`Using cached contents data`);
     }
-    const {
-      annotationsToSync,
-      contents,
-    } = JSON.parse(localStorage.getItem(CacheKey));
+    const contents = JSON.parse(localStorage.getItem(ContentsCacheKey));
     println(`Assembling highlights...`);
-    const highlights = assembleHighlights(annotationsToSync, contents);
+    const highlights = assembleHighlights(annotations, contents);
     println(highlights);
   } catch (err) {
+    console.error('Failed to check annotations', err);
     println('Failed to check annotations', String(err));
   }
 }
@@ -45,8 +36,8 @@ sync.onclick = () => {
 }
 clearCache.onclick = () => {
   output.textContent = '';
-  localStorage.removeItem(CacheKey);
-  println(`Cleared cache`);
+  localStorage.removeItem(ContentsCacheKey);
+  println(`Cleared cached contents data`);
 }
 
 function getAllHighlightUris(annotations) {
