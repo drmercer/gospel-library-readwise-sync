@@ -1,5 +1,3 @@
-import { chunks } from './utils/array.js';
-
 /**
  * Functions for calling the "Annotations" API used by Gospel Library.
  *
@@ -70,6 +68,8 @@ export async function getAnnotations() {
 }
 
 /**
+ * IMPORTANT: callers should batch the list of URIs before calling this function.
+ * The API returns errors more often on bigger list sizes, and maxes out entirely at 155 or so.
  *
  * @param {string[]} uris A list of URIs to load the contents of.
  * @returns A promise resolving to the loaded contents - an object keyed by URI.
@@ -95,28 +95,7 @@ export async function getAnnotations() {
 }
  * ```
  */
-export async function getContents(uris, log) {
-  const BatchSize = 50; // seems to max out at 155, strangely, but we use a smaller number to be a good citizen
-  const result = {};
-  let i = 1; // for logging
-  let first = true;
-  // use new Set(...) to filter out duplicates
-  for (const batch of chunks([...new Set(uris)], BatchSize)) {
-    if (!first) {
-      // add a delay between requests to be a good citizen
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-    } else {
-      first = false;
-    }
-
-    log?.(`Getting contents of batch ${i++}, size ${batch.length}...`);
-    const batchResult = await getContentsInner(batch);
-    Object.assign(result, batchResult);
-  }
-  return result;
-}
-
-async function getContentsInner(uris) {
+export async function getContents(uris) {
   const url = new URL('https://www.churchofjesuschrist.org/content/api/v3?lang=eng');
   for (const uri of uris) {
     url.searchParams.append('uris', uri);
