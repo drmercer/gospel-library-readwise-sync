@@ -9,6 +9,10 @@ const SeparatorRegex = /([🌌\s—–-]+)/g;
 export function assembleHighlights(annotations, contents) {
   return annotations.map(a => {
     try {
+      const id = a.annotationId;
+      if (!id) {
+        throw new Error('Missing annotationId on annotation')
+      }
       const highlights = a?.highlights ?? [];
       const contentObjs = highlights.map(h => {
         const c = contents[h.uri];
@@ -43,6 +47,7 @@ export function assembleHighlights(annotations, contents) {
         .join('\n\n');
       const noteMd = a.note?.content ? noteToMarkdown(a.note.content) : undefined;
       return {
+        id,
         locationUri,
         fullMd,
         highlightMd,
