@@ -4,7 +4,7 @@
  * @module
  */
 
-export function turndown(html, rules) {
+export function turndown(html, rules = {}) {
   const td = new TurndownService();
   for (const [ruleName, rule] of Object.entries(rules)) {
     td.addRule(ruleName, rule);

@@ -41,10 +41,12 @@ export function assembleHighlights(annotations, contents) {
         .map(withoutPlaceholders)
         .map(s => s.trim())
         .join('\n\n');
+      const noteMd = a.note?.content ? noteToMarkdown(a.note.content) : undefined;
       return {
         locationUri,
         fullMd,
         highlightMd,
+        noteMd,
       }
     } catch (err) {
       // possibly a missing URI, if content was moved. Not sure how to recover from that. (😢)
@@ -105,4 +107,9 @@ function withoutPlaceholders(md) {
     .replaceAll('🦶', '')
     .replaceAll('🌌', '')
   return cleaned
+}
+
+function noteToMarkdown(noteHtml) {
+  return turndown(noteHtml)
+    .replace(/\n\s+\n/g, '\n\n') // remove extra blank lines
 }
