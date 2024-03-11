@@ -22,7 +22,7 @@ export function assembleHighlights(annotations, contents) {
         }
         return c
       });
-      const locationUri = contentObjs[0] ? 'https://www.churchofjesuschrist.org/study' + contentObjs[0].referenceURI : undefined;
+      const source = contentObjs[0] ? getSourceInfo(a, contentObjs[0]) : undefined;
       const mdParts = contentObjs
         .flatMap(c => c.content)
         .map(c => c.markup)
@@ -48,7 +48,7 @@ export function assembleHighlights(annotations, contents) {
       const noteMd = a.note?.content ? noteToMarkdown(a.note.content) : undefined;
       return {
         id,
-        locationUri,
+        source,
         fullMd,
         highlightMd,
         noteMd,
@@ -60,6 +60,17 @@ export function assembleHighlights(annotations, contents) {
       return undefined;
     }
   }).filter(h => !!h) // filter out errors
+}
+
+function getSourceInfo(annotation, contentObj) {
+  const url = 'https://www.churchofjesuschrist.org/study' + annotation.uri;
+  const author = contentObj.authorName || contentObj.publication;
+  const title = contentObj.headline;
+  return {
+    url,
+    author,
+    title,
+  };
 }
 
 function wordOffsetToIndex(wordsAndSeparators, wordOffset) {

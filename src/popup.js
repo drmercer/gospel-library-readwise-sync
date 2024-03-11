@@ -36,12 +36,16 @@ upload.onclick = async () => {
     }
     println(`Syncing ${hs.length} highlights to readwise...`);
     const accessToken = getReadwiseAccessToken();
-    await putHighlights(accessToken, hs.map(h => ({
+    const result = await putHighlights(accessToken, hs.map(h => ({
       highlight_url: 'https://glsync.danmercer.net/annotation/' + encodeURIComponent(h.id), // this lets us dedupe by annotation ID
       text: h.highlightMd,
-      source_url: h.locationUri,
+      source_url: h.source?.url,
+      author: h.source?.author,
+      title: h.source?.title,
       note: h.noteMd,
     })))
+    println('Successfully uploaded! See https://readwise.io/library')
+    println('Response:', result);
   } catch (err) {
     console.error('Failed to upload highlights', err);
     println('Failed to upload highlights', String(err));

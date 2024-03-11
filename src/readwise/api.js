@@ -38,4 +38,5 @@ export async function putHighlights(token, highlights) {
   if (!res.ok) {
     throw new Error(`Unexpected error from "put highlights" request. ${await debugRes(res)}`);
   }
+  return await res.json();
 }
