@@ -68,8 +68,36 @@ export function assembleHighlights(annotations, contents) {
   }).filter(h => !!h) // filter out errors
 }
 
+const knownSources = [
+  {
+    url: 'https://www.churchofjesuschrist.org/study/scriptures/bofm',
+    title: 'Book of Mormon',
+  },
+  {
+    url: 'https://www.churchofjesuschrist.org/study/scriptures/nt',
+    title: 'New Testament',
+  },
+  {
+    url: 'https://www.churchofjesuschrist.org/study/scriptures/ot',
+    title: 'Old Testament',
+  },
+  {
+    url: 'https://www.churchofjesuschrist.org/study/scriptures/dc-testament',
+    title: 'Doctrine and Covenants',
+  },
+  {
+    url: 'https://www.churchofjesuschrist.org/study/scriptures/pgp',
+    title: 'Pearl of Great Price',
+  },
+]
+
 function getSourceInfo(annotation, contentObj) {
   const url = 'https://www.churchofjesuschrist.org/study' + annotation.uri;
+  // check for known sources first - this groups BoM citations into one source, for example
+  const source = knownSources.find(s => url.startsWith(s.url));
+  if (source) {
+    return source;
+  }
   const author = contentObj.authorName || contentObj.publication;
   const title = contentObj.headline;
   return {

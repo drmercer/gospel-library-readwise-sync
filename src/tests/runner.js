@@ -24,7 +24,6 @@ function diff(strA, strB) {
   let i = 0;
   while (i < strA.length || i < strB.length) {
     if (strA[i] != strB[i]) {
-      debugger;
       diff.push(`[${strA[i]}]`);
     } else {
       diff.push(strA[i]);

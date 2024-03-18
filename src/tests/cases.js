@@ -31,9 +31,8 @@ export const testCases = [
     {
       "id": "4c98de2d-9dcf-4244-b40d-e521beb48082",
       "source": {
-        "url": "https://www.churchofjesuschrist.org/study/scriptures/bofm/3-ne/27",
-        "author": "Book of Mormon",
-        "title": "3\xa0Nephi 27"
+        "url": "https://www.churchofjesuschrist.org/study/scriptures/bofm",
+        "title": "Book of Mormon"
       },
       "fullMd": "32 But behold, it sorroweth me because of the fourth generation from this generation, for they are led away captive by him even as was the son of perdition; for they will sell me for silver and for gold, and for that which moth doth corrupt and which thieves can break through and steal. And in that day will I visit them, even in turning their works upon their own heads.",
       "highlightMd": "that which moth doth corrupt and which thieves can break through and steal.",
@@ -76,9 +75,8 @@ export const testCases = [
     {
       "id": "cd428da9-26aa-4db4-b503-b07c7e64311a",
       "source": {
-        "url": "https://www.churchofjesuschrist.org/study/scriptures/bofm/alma/31",
-        "author": "Book of Mormon",
-        "title": "Alma 31"
+        "url": "https://www.churchofjesuschrist.org/study/scriptures/bofm",
+        "title": "Book of Mormon",
       },
       "fullMd": "24 Now when Alma saw this his heart was grieved; for he saw that they were a wicked and a perverse people; yea, he saw that their hearts were set upon gold, and upon silver, and upon all manner of fine goods.\n\n25 Yea, and he also saw that their hearts were lifted up unto great boasting, in their pride.",
       "highlightMd": "he saw that they were a wicked and a perverse people; yea, he saw that their hearts were set upon gold, and upon silver, and upon all manner of fine goods.\n\n25 Yea, and he also saw that their hearts were lifted up unto great boasting, in their pride."
@@ -113,9 +111,8 @@ export const testCases = [
     {
       "id": "07b28d43-292a-4ccc-b0ac-e82aff3c45f4",
       "source": {
-        "url": "https://www.churchofjesuschrist.org/study/scriptures/dc-testament/dc/131",
-        "author": "Doctrine and Covenants",
-        "title": "Doctrine and Covenants 131"
+        "url": "https://www.churchofjesuschrist.org/study/scriptures/dc-testament",
+        "title": "Doctrine and Covenants"
       },
       "fullMd": "2 And in order to obtain the highest, a man must enter into this order of the priesthood \\[meaning the new and everlasting covenant of marriage\\];",
       "highlightMd": "2 And in order to obtain the highest, a man must enter into this order of the priesthood \\[meaning the new and everlasting covenant of marriage\\];"

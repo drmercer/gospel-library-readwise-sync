@@ -40,7 +40,7 @@ upload.onclick = async () => {
     println(`Syncing ${hs.length} highlights to readwise...`);
     const accessToken = getReadwiseAccessToken();
     const result = await putHighlights(accessToken, hs.map(h => ({
-      highlight_url: 'https://glsync.danmercer.net/annotation/' + encodeURIComponent(h.id), // this lets us dedupe by annotation ID
+      highlight_url: 'https://www.churchofjesuschrist.org/notes?lang=eng&note=' + encodeURIComponent(h.id),
       text: h.highlightMd,
       source_url: h.source?.url,
       author: h.source?.author,
