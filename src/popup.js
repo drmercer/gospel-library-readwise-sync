@@ -1,14 +1,17 @@
-import { assembleHighlights } from "./annotationprocessing.js";
+import { assembleHighlights, getContentUrisForAnnotation } from "./annotationprocessing.js";
 import { getAnnotations, getContents } from "./annotationsapi.js";
 import { putHighlights } from "./readwise/api.js";
 import { chunks } from "./utils/array.js";
+import { runTests } from "./tests/runner.js";
 
 const [output] = document.querySelectorAll('pre');
-const [download, upload, changeReadwiseToken, clearCache] = document.querySelectorAll('button');
+const [download, upload, changeReadwiseToken, clearCache, createTestCase, runTestsBtn] = document.querySelectorAll('button');
 
 const ContentsCacheKey = 'CachedContents'
 const ReadwiseTokenKey = 'ReadwiseToken'
 
+let annotations = [];
+const contents = JSON.parse(localStorage.getItem(ContentsCacheKey) || '{}');
 let highlights = [];
 
 output.textContent = 'Hello, world!';
@@ -16,8 +19,8 @@ download.onclick = async () => {
   output.textContent = '';
   try {
     println(`Downloading highlights...`);
-    const annotations = (await getAnnotations()).slice(100);
-    const contents = await fetchContents(annotations);
+    annotations = (await getAnnotations()).slice(100);
+    contents = await fetchContents(annotations);
     println(`Assembling highlights...`);
     highlights = assembleHighlights(annotations, contents);
     println(highlights);
@@ -56,13 +59,49 @@ changeReadwiseToken.onclick = () => {
 }
 clearCache.onclick = () => {
   output.textContent = '';
+  if (!confirm('Are you sure? This is only needed if the contents object is corrupted.')) {
+    println('Nothing doing!');
+    return;
+  }
   localStorage.removeItem(ContentsCacheKey);
   println(`Cleared cached contents data`);
+}
+createTestCase.onclick = () => {
+  output.textContent = '';
+  println('Creating test case...');
+  const search = prompt('Annotation query:');
+  if (!search) {
+    println('Canceled');
+  } else {
+    try {
+      const a = annotations.find(a => {
+        return !!getContentUrisForAnnotation(a).find(uri => uri.includes(search));
+      });
+      if (!a) {
+        debugger;
+        throw new Error(`No annotation found with URI containing ${search}`);
+      }
+      const [h] = assembleHighlights([a], contents);
+      const testCase = [a, h];
+      println(testCase);
+    } catch (err) {
+      console.error('Failed to create test case', err);
+      println('Failed to create test case', String(err));
+    }
+  }
+}
+runTestsBtn.onclick = () => {
+  output.textContent = '';
+  try {
+    runTests(println, contents);
+  } catch (err) {
+    console.error('Failed to run tests', err);
+    println('Failed to run tests', String(err));
+  }
 }
 
 async function fetchContents(annotations) {
   // first, load any cached contents
-  const contents = JSON.parse(localStorage.getItem(ContentsCacheKey) || '{}');
   const newUris = annotations
     .flatMap(a => a?.highlights ?? [])
     .map(h => h.uri)

@@ -1,5 +1,10 @@
 import { turndown } from "./turndownwrapper.js";
 
+export function getContentUrisForAnnotation(annotation) {
+  // TODO combine URIs to fetch contents more intelligently? Would enable getting scripture references
+  return annotation?.highlights?.map(h => h.uri) ?? [];
+}
+
 // words can be split by spaces or dashes. The 🌌 is placed around links by htmlToMarkdownWithPlaceholders() to
 // ensure they count as separate words.
 // NOTE: the capturing group is important, it lets us split on this regex and keep the separators in the resulting array
@@ -14,11 +19,12 @@ export function assembleHighlights(annotations, contents) {
         throw new Error('Missing annotationId on annotation')
       }
       const highlights = a?.highlights ?? [];
-      const contentObjs = highlights.map(h => {
-        const c = contents[h.uri];
+      const uris = getContentUrisForAnnotation(a);
+      const contentObjs = uris.map(uri => {
+        const c = contents[uri];
         if (!c) {
-          console.error(`Missing contents for URI '${h.uri}'`, contents);
-          throw new Error(`Missing contents for URI '${h.uri}'`)
+          console.error(`Missing contents for URI '${uri}'`, contents);
+          throw new Error(`Missing contents for URI '${uri}'`)
         }
         return c
       });
