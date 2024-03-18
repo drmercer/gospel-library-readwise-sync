@@ -20,7 +20,7 @@ download.onclick = async () => {
   try {
     println(`Downloading highlights...`);
     annotations = (await getAnnotations()).slice(100);
-    contents = await fetchContents(annotations);
+    await fetchContents(annotations);
     println(`Assembling highlights...`);
     highlights = assembleHighlights(annotations, contents);
     println(highlights);
@@ -129,8 +129,6 @@ async function fetchContents(annotations) {
     Object.assign(contents, batchResult);
     localStorage.setItem(ContentsCacheKey, JSON.stringify(contents));
   }
-
-  return contents;
 }
 
 function prettyPrint(x) {
