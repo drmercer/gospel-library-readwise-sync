@@ -33,7 +33,7 @@ export const testCases = [
       "source": {
         "url": "https://www.churchofjesuschrist.org/study/scriptures/bofm/3-ne/27",
         "author": "Book of Mormon",
-        "title": "3 Nephi 27"
+        "title": "3\xa0Nephi 27"
       },
       "fullMd": "32 But behold, it sorroweth me because of the fourth generation from this generation, for they are led away captive by him even as was the son of perdition; for they will sell me for silver and for gold, and for that which moth doth corrupt and which thieves can break through and steal. And in that day will I visit them, even in turning their works upon their own heads.",
       "highlightMd": "that which moth doth corrupt and which thieves can break through and steal.",
