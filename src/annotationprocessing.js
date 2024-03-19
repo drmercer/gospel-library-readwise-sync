@@ -72,22 +72,32 @@ const knownSources = [
   {
     url: 'https://www.churchofjesuschrist.org/study/scriptures/bofm',
     title: 'Book of Mormon',
+    author: 'The Church of Jesus Christ of Latter-day Saints',
+    type: 'books',
   },
   {
     url: 'https://www.churchofjesuschrist.org/study/scriptures/nt',
     title: 'New Testament',
+    author: 'The Church of Jesus Christ of Latter-day Saints',
+    type: 'books',
   },
   {
     url: 'https://www.churchofjesuschrist.org/study/scriptures/ot',
     title: 'Old Testament',
+    author: 'The Church of Jesus Christ of Latter-day Saints',
+    type: 'books',
   },
   {
     url: 'https://www.churchofjesuschrist.org/study/scriptures/dc-testament',
     title: 'Doctrine and Covenants',
+    author: 'The Church of Jesus Christ of Latter-day Saints',
+    type: 'books',
   },
   {
     url: 'https://www.churchofjesuschrist.org/study/scriptures/pgp',
     title: 'Pearl of Great Price',
+    author: 'The Church of Jesus Christ of Latter-day Saints',
+    type: 'books',
   },
 ]
 

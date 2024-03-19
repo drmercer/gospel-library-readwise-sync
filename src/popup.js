@@ -19,7 +19,7 @@ download.onclick = async () => {
   output.textContent = '';
   try {
     println(`Downloading highlights...`);
-    annotations = (await getAnnotations()).slice(100);
+    annotations = await getAnnotations();
     await fetchContents(annotations);
     println(`Assembling highlights...`);
     highlights = assembleHighlights(annotations, contents);
@@ -32,21 +32,26 @@ download.onclick = async () => {
 upload.onclick = async () => {
   output.textContent = '';
   try {
-    const hs = highlights.slice(0, 10);
+    const hs = highlights.slice(0, 30);
     if (!hs.length) {
       println('No highlights to upload!');
       return;
     }
     println(`Syncing ${hs.length} highlights to readwise...`);
     const accessToken = getReadwiseAccessToken();
-    const result = await putHighlights(accessToken, hs.map(h => ({
+
+    /** @type {(import('./readwise/api.js').Highlight)[]} */
+    const readwiseHighlights = hs.map(h => ({
       highlight_url: 'https://www.churchofjesuschrist.org/notes?lang=eng&note=' + encodeURIComponent(h.id),
       text: h.highlightMd,
       source_url: h.source?.url,
       author: h.source?.author,
       title: h.source?.title,
+      source_type: h.source?.type,
       note: h.noteMd,
-    })))
+    }))
+
+    const result = await putHighlights(accessToken, readwiseHighlights)
     println('Successfully uploaded! See https://readwise.io/library')
     println('Response:', result);
   } catch (err) {
@@ -54,6 +59,9 @@ upload.onclick = async () => {
     println('Failed to upload highlights', String(err));
   }
 }
+
+// Configuration
+
 changeReadwiseToken.onclick = () => {
   promptForReadwiseToken();
 }
@@ -66,6 +74,9 @@ clearCache.onclick = () => {
   localStorage.removeItem(ContentsCacheKey);
   println(`Cleared cached contents data`);
 }
+
+// Tests
+
 createTestCase.onclick = () => {
   output.textContent = '';
   println('Creating test case...');
