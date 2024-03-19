@@ -52,12 +52,15 @@ export function assembleHighlights(annotations, contents) {
         .map(s => s.trim())
         .join('\n\n');
       const noteMd = a.note?.content ? noteToMarkdown(a.note.content) : undefined;
+      /** @type {string[]} tags */
+      const tags = a.tags?.map(t => t.name) ?? [];
       return {
         id,
         source,
         fullMd,
         highlightMd,
         noteMd,
+        tags,
       }
     } catch (err) {
       // possibly a missing URI, if content was moved. Not sure how to recover from that. (😢)

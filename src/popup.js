@@ -3,6 +3,7 @@ import { getAnnotations, getContents } from "./annotationsapi.js";
 import { putHighlights } from "./readwise/api.js";
 import { chunks } from "./utils/array.js";
 import { runTests } from "./tests/runner.js";
+import { makeReadwiseNote } from "./readwise/processing.js";
 
 const [output] = document.querySelectorAll('pre');
 const [download, upload, changeReadwiseToken, clearCache, createTestCase, runTestsBtn] = document.querySelectorAll('button');
@@ -32,7 +33,7 @@ download.onclick = async () => {
 upload.onclick = async () => {
   output.textContent = '';
   try {
-    const hs = highlights.slice(0, 30);
+    const hs = highlights.slice(0, 50);
     if (!hs.length) {
       println('No highlights to upload!');
       return;
@@ -48,8 +49,11 @@ upload.onclick = async () => {
       author: h.source?.author,
       title: h.source?.title,
       source_type: h.source?.type,
-      note: h.noteMd,
+      note: makeReadwiseNote(h.noteMd, h.tags),
     }))
+
+    // Uncomment for debugging
+    // if (window) return println(readwiseHighlights);
 
     const result = await putHighlights(accessToken, readwiseHighlights)
     println('Successfully uploaded! See https://readwise.io/library')
