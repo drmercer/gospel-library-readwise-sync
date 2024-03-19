@@ -4,7 +4,7 @@
  * ```
  * my note
  *
- * .gl .gl/tag1 .gl/tag2 .gl/tag3_with_words_separated_by_underscores
+ * .gl .gl_tag1 .gl_tag2 .gl_tag3_with_words_separated_by_underscores
  * ```
  *
  * @param {string} noteMd
@@ -15,7 +15,7 @@ export function makeReadwiseNote(noteMd = '', tags = []) {
   return (
     tags.map(tag => {
       const cleanedTag = tag.replace(/\s+/g, '_').toLowerCase();
-      return `.gl/${cleanedTag}`;
+      return `.gl_${cleanedTag}`;
     }).concat(['.gl']).join(' ') + '\n\n' + noteMd
   ).trim();
 }
