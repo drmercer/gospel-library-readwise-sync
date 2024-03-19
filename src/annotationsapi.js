@@ -51,6 +51,7 @@ import { debugRes } from './utils/debug.js';
  * ```
  */
 export async function getAnnotations() {
+  // TODO pagination
   const res = await fetch('https://www.churchofjesuschrist.org/notes/api/v3/annotationsWithMeta?setId=all&type=highlight&numberToReturn=1000', {
     headers: {
       accept: 'application/json',

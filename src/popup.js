@@ -33,7 +33,7 @@ download.onclick = async () => {
 upload.onclick = async () => {
   output.textContent = '';
   try {
-    const hs = highlights.slice(0, 50);
+    const hs = highlights;
     if (!hs.length) {
       println('No highlights to upload!');
       return;
@@ -55,6 +55,7 @@ upload.onclick = async () => {
     // Uncomment for debugging
     // if (window) return println(readwiseHighlights);
 
+    // TODO do batch uploads
     const result = await putHighlights(accessToken, readwiseHighlights)
     println('Successfully uploaded! See https://readwise.io/library')
     println('Response:', result);

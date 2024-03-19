@@ -54,6 +54,9 @@ export function assembleHighlights(annotations, contents) {
       const noteMd = a.note?.content ? noteToMarkdown(a.note.content) : undefined;
       /** @type {string[]} tags */
       const tags = a.tags?.map(t => t.name) ?? [];
+      if (!highlightMd) {
+        console.warn(`Missing text for annotation ${id}`, { a, fullMd, highlightMd });
+      }
       return {
         id,
         source,
@@ -65,10 +68,10 @@ export function assembleHighlights(annotations, contents) {
     } catch (err) {
       // possibly a missing URI, if content was moved. Not sure how to recover from that. (😢)
       const uri = a.uri ?? a.highlights?.[0]?.uri ?? 'unknown'
-      console.error(`Failed to assemble highlight on ${uri}`, a, err);
+      console.warn(`Failed to assemble highlight on ${uri} (possibly the content was moved 😢)`, a, err);
       return undefined;
     }
-  }).filter(h => !!h) // filter out errors
+  }).filter(h => !!h?.highlightMd) // filter out errors and empty highlights
 }
 
 const knownSources = [
