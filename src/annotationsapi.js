@@ -8,7 +8,10 @@
 
 import { debugRes } from './utils/debug.js';
 
+const DownloadBatchSize = 1000;
+
 /**
+ * @param {number} startAt The index of the first annotation to return.
  * @returns A promise resolving with a list of the user's Gospel Library annotations.
  *
  * Here is a redacted example annotation object:
@@ -50,9 +53,8 @@ import { debugRes } from './utils/debug.js';
 }
  * ```
  */
-export async function getAnnotations() {
-  // TODO pagination
-  const res = await fetch('https://www.churchofjesuschrist.org/notes/api/v3/annotationsWithMeta?setId=all&type=highlight&numberToReturn=1000', {
+export async function getAnnotations(startAt = 1) {
+  const res = await fetch(`https://www.churchofjesuschrist.org/notes/api/v3/annotationsWithMeta?setId=all&type=highlight&numberToReturn=${DownloadBatchSize}&start=${startAt}`, {
     headers: {
       accept: 'application/json',
     },
@@ -68,6 +70,20 @@ export async function getAnnotations() {
     // TODO examine error codes and return a more descriptive error
     throw new Error(`Failed to load annotations. ${await debugRes(res)}`);
   }
+}
+
+export async function getAllAnnotations() {
+  let annotations = [];
+  let startAt = 1;
+  while (true) {
+    const newAnnotations = await getAnnotations(startAt);
+    if (newAnnotations.length === 0) {
+      break;
+    }
+    annotations = annotations.concat(newAnnotations);
+    startAt += newAnnotations.length;
+  }
+  return annotations;
 }
 
 /**

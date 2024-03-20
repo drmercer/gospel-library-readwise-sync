@@ -1,12 +1,12 @@
 import { assembleHighlights, getContentUrisForAnnotation } from "./annotationprocessing.js";
-import { getAnnotations, getContents } from "./annotationsapi.js";
+import { getAllAnnotations, getContents } from "./annotationsapi.js";
 import { putHighlightsBatched } from "./readwise/api.js";
 import { chunks } from "./utils/array.js";
 import { runTests } from "./tests/runner.js";
 import { makeReadwiseNote } from "./readwise/processing.js";
 
 const [output] = document.querySelectorAll('pre');
-const [sync, changeReadwiseToken, clearCache, createTestCase, runTestsBtn] = document.querySelectorAll('button');
+const [sync, changeReadwiseToken, clearCache, resetLastSync, createTestCase, runTestsBtn] = document.querySelectorAll('button');
 
 const ContentsCacheKey = 'CachedContents'
 const ReadwiseTokenKey = 'ReadwiseToken'
@@ -24,9 +24,9 @@ sync.onclick = async () => {
   output.textContent = '';
   try {
     println(`Downloading highlights...`);
-    annotations = await getAnnotations();
-    await fetchContents(annotations);
+    annotations = await getAllAnnotations();
     println(`Downloaded ${annotations.length} highlights.`);
+    await fetchContents(annotations);
     highlights = assembleHighlights(annotations, contents);
     if (highlights.length < annotations.length) {
       println(`WARNING: ${annotations.length - highlights.length} highlights had errors and cannot be synced. (Sometimes this happens when content is moved in Gospel Library. 😢)`);
@@ -96,6 +96,11 @@ clearCache.onclick = () => {
   }
   localStorage.removeItem(ContentsCacheKey);
   println(`Cleared cached contents data`);
+}
+resetLastSync.onclick = () => {
+  output.textContent = '';
+  localStorage.removeItem(LastSyncTimeKey);
+  println(`Cleared last sync time`);
 }
 
 // Tests
