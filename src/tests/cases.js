@@ -30,13 +30,18 @@ export const testCases = [
     },
     {
       "id": "4c98de2d-9dcf-4244-b40d-e521beb48082",
+      "created": "2021-02-08T14:59:10.071Z",
+      "updated": "2021-02-08T15:00:23.236Z",
       "source": {
         "url": "https://www.churchofjesuschrist.org/study/scriptures/bofm",
-        "title": "Book of Mormon"
+        "title": "Book of Mormon",
+        "author": "The Church of Jesus Christ of Latter-day Saints",
+        "type": "books",
       },
       "fullMd": "32 But behold, it sorroweth me because of the fourth generation from this generation, for they are led away captive by him even as was the son of perdition; for they will sell me for silver and for gold, and for that which moth doth corrupt and which thieves can break through and steal. And in that day will I visit them, even in turning their works upon their own heads.",
       "highlightMd": "that which moth doth corrupt and which thieves can break through and steal.",
-      "noteMd": "Interesting to note how Jesus describes the objects of the wicked people's pride. Prideful people value things that aren't actually worth it."
+      "noteMd": "Interesting to note how Jesus describes the objects of the wicked people's pride. Prideful people value things that aren't actually worth it.",
+      "tags": [],
     }
   ],
   // Multiple verses
@@ -74,12 +79,17 @@ export const testCases = [
     },
     {
       "id": "cd428da9-26aa-4db4-b503-b07c7e64311a",
+      "created": "2023-10-20T04:42:21.769Z",
+      "updated": "2023-10-20T04:42:27.488Z",
       "source": {
         "url": "https://www.churchofjesuschrist.org/study/scriptures/bofm",
         "title": "Book of Mormon",
+        "author": "The Church of Jesus Christ of Latter-day Saints",
+        "type": "books",
       },
       "fullMd": "24 Now when Alma saw this his heart was grieved; for he saw that they were a wicked and a perverse people; yea, he saw that their hearts were set upon gold, and upon silver, and upon all manner of fine goods.\n\n25 Yea, and he also saw that their hearts were lifted up unto great boasting, in their pride.",
-      "highlightMd": "he saw that they were a wicked and a perverse people; yea, he saw that their hearts were set upon gold, and upon silver, and upon all manner of fine goods.\n\n25 Yea, and he also saw that their hearts were lifted up unto great boasting, in their pride."
+      "highlightMd": "he saw that they were a wicked and a perverse people; yea, he saw that their hearts were set upon gold, and upon silver, and upon all manner of fine goods.\n\n25 Yea, and he also saw that their hearts were lifted up unto great boasting, in their pride.",
+      "tags": [],
     }
   ],
   // brackets in the source text
@@ -110,12 +120,17 @@ export const testCases = [
     },
     {
       "id": "07b28d43-292a-4ccc-b0ac-e82aff3c45f4",
+      "created": "2017-06-02T01:43:49.788Z",
+      "updated": "2017-06-02T01:43:49.788Z",
       "source": {
         "url": "https://www.churchofjesuschrist.org/study/scriptures/dc-testament",
-        "title": "Doctrine and Covenants"
+        "title": "Doctrine and Covenants",
+        "author": "The Church of Jesus Christ of Latter-day Saints",
+        "type": "books",
       },
       "fullMd": "2 And in order to obtain the highest, a man must enter into this order of the priesthood \\[meaning the new and everlasting covenant of marriage\\];",
-      "highlightMd": "2 And in order to obtain the highest, a man must enter into this order of the priesthood \\[meaning the new and everlasting covenant of marriage\\];"
+      "highlightMd": "2 And in order to obtain the highest, a man must enter into this order of the priesthood \\[meaning the new and everlasting covenant of marriage\\];",
+      "tags": [],
     }
   ]
 ]
