@@ -49,6 +49,7 @@ export async function putHighlights(token, highlights) {
  */
 export async function putHighlightsBatched(token, highlights, log) {
   const BatchSize = 100;
+  const chunkCount = Math.ceil(highlights.length / BatchSize);
   let i = 1; // for logging
   let first = true;
   let results = [];
@@ -60,7 +61,7 @@ export async function putHighlightsBatched(token, highlights, log) {
       first = false;
     }
 
-    log?.(`Uploading highlights (batch ${i++}, size ${batch.length})...`);
+    log?.(`Uploading highlights (batch ${i++}/${chunkCount})...`);
     const result = await putHighlights(token, batch);
     results.push(result);
   }
