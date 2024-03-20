@@ -1,5 +1,5 @@
 import { assembleHighlights, getContentUrisForAnnotation } from "./annotationprocessing.js";
-import { getAllAnnotations, getContents } from "./annotationsapi.js";
+import { LoginRequiredError, getAllAnnotations, getContents } from "./annotationsapi.js";
 import { putHighlightsBatched } from "./readwise/api.js";
 import { chunks } from "./utils/array.js";
 import { runTests } from "./tests/runner.js";
@@ -35,8 +35,12 @@ sync.onclick = async () => {
     // Uncomment for debugging
     // if (window) return println(highlights);
   } catch (err) {
-    console.error('Failed to download highlights', err);
-    println('Failed to download highlights', String(err));
+    if (err instanceof LoginRequiredError) {
+      println('Please login to ChurchofJesusChrist.org first. (Click the "My Gospel Library Notes" link below.)');
+    } else {
+      console.error('Failed to download highlights', err);
+      println('Failed to download highlights', String(err));
+    }
     return;
   }
   if (!highlights.length) {
@@ -71,7 +75,7 @@ sync.onclick = async () => {
 
     println(`Uploading ${readwiseHighlights.length} highlights to Readwise.`);
     const result = await putHighlightsBatched(accessToken, readwiseHighlights, println)
-    println('Successfully uploaded! See https://readwise.io/library')
+    println('Successfully uploaded! Click the "My Readwise Library" link below to check out your new highlights.')
     lastSyncTime = new Date();
     localStorage.setItem(LastSyncTimeKey, lastSyncTime.toISOString());
 

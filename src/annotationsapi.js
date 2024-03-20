@@ -10,6 +10,12 @@ import { debugRes } from './utils/debug.js';
 
 const DownloadBatchSize = 1000;
 
+export class LoginRequiredError extends Error {
+  constructor() {
+    super('You need to log into churchofjesuschrist.org');
+  }
+}
+
 /**
  * @param {number} startAt The index of the first annotation to return.
  * @returns A promise resolving with a list of the user's Gospel Library annotations.
@@ -66,8 +72,9 @@ export async function getAnnotations(startAt = 1) {
     } else {
       throw new Error(`Malformed annotations object. Keys: ${Object.keys(result)}`);
     }
+  } else if (res.status === 401) {
+    throw new LoginRequiredError();
   } else {
-    // TODO examine error codes and return a more descriptive error
     throw new Error(`Failed to load annotations. ${await debugRes(res)}`);
   }
 }
