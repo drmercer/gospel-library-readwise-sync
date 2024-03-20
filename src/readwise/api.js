@@ -4,6 +4,7 @@
  * @see https://readwise.io/api_deets
  */
 
+import { chunks } from '../utils/array.js';
 import { debugRes } from '../utils/debug.js';
 
 /**
@@ -39,4 +40,29 @@ export async function putHighlights(token, highlights) {
     throw new Error(`Unexpected error from "put highlights" request. ${await debugRes(res)}`);
   }
   return await res.json();
+}
+
+
+/**
+ * Uploads the given highlights to Readwise
+ * @param {Highlight[]} highlights
+ */
+export async function putHighlightsBatched(token, highlights, log) {
+  const BatchSize = 100;
+  let i = 1; // for logging
+  let first = true;
+  let results = [];
+  for (const batch of chunks(highlights, BatchSize)) {
+    if (!first) {
+      // add a delay between requests to be a good citizen
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+    } else {
+      first = false;
+    }
+
+    log?.(`Uploading highlights (batch ${i++}, size ${batch.length})...`);
+    const result = await putHighlights(token, batch);
+    results.push(result);
+  }
+  return results;
 }

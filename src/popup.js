@@ -1,6 +1,6 @@
 import { assembleHighlights, getContentUrisForAnnotation } from "./annotationprocessing.js";
 import { getAnnotations, getContents } from "./annotationsapi.js";
-import { putHighlights } from "./readwise/api.js";
+import { putHighlightsBatched } from "./readwise/api.js";
 import { chunks } from "./utils/array.js";
 import { runTests } from "./tests/runner.js";
 import { makeReadwiseNote } from "./readwise/processing.js";
@@ -56,8 +56,8 @@ upload.onclick = async () => {
     // Uncomment for debugging
     // if (window) return println(readwiseHighlights);
 
-    // TODO do batch uploads
-    const result = await putHighlights(accessToken, readwiseHighlights)
+    println(`Uploading ${readwiseHighlights.length} highlights to Readwise.`);
+    const result = await putHighlightsBatched(accessToken, readwiseHighlights, println)
     println('Successfully uploaded! See https://readwise.io/library')
     println('Response:', result);
   } catch (err) {
@@ -131,7 +131,6 @@ async function fetchContents(annotations) {
   const BatchSize = 50; // seems to max out at 155, strangely, but we use a smaller number to be a good citizen
   let i = 1; // for logging
   let first = true;
-  // use new Set(...) to filter out duplicates
   for (const batch of chunks(urisToFetch, BatchSize)) {
     if (!first) {
       // add a delay between requests to be a good citizen
