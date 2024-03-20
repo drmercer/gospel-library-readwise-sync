@@ -6,36 +6,49 @@ import { runTests } from "./tests/runner.js";
 import { makeReadwiseNote } from "./readwise/processing.js";
 
 const [output] = document.querySelectorAll('pre');
-const [download, upload, changeReadwiseToken, clearCache, createTestCase, runTestsBtn] = document.querySelectorAll('button');
+const [sync, changeReadwiseToken, clearCache, createTestCase, runTestsBtn] = document.querySelectorAll('button');
 
 const ContentsCacheKey = 'CachedContents'
 const ReadwiseTokenKey = 'ReadwiseToken'
+const LastSyncTimeKey = 'LastSyncTime'
 
 let annotations = [];
 const contents = JSON.parse(localStorage.getItem(ContentsCacheKey) || '{}');
 let highlights = [];
 
+const rawLastSyncTime = localStorage.getItem(LastSyncTimeKey);
+let lastSyncTime = rawLastSyncTime ? new Date(rawLastSyncTime) : undefined;
+
 output.textContent = 'Hello, world!';
-download.onclick = async () => {
+sync.onclick = async () => {
   output.textContent = '';
   try {
     println(`Downloading highlights...`);
     annotations = await getAnnotations();
     await fetchContents(annotations);
-    println(`Assembling highlights...`);
+    println(`Downloaded ${annotations.length} highlights.`);
     highlights = assembleHighlights(annotations, contents);
-    println(highlights);
+    if (highlights.length < annotations.length) {
+      println(`WARNING: ${annotations.length - highlights.length} highlights had errors and cannot be synced. (Sometimes this happens when content is moved in Gospel Library. 😢)`);
+    }
+
+    // Uncomment for debugging
+    // if (window) return println(highlights);
   } catch (err) {
     console.error('Failed to download highlights', err);
     println('Failed to download highlights', String(err));
+    return;
   }
-}
-upload.onclick = async () => {
-  output.textContent = '';
+  if (!highlights.length) {
+    println('No highlights found!');
+    return;
+  }
   try {
-    const hs = highlights;
+    const hs = highlights.filter(h => {
+      return !lastSyncTime || h.updated > lastSyncTime;
+    });
     if (!hs.length) {
-      println('No highlights to upload!');
+      println(`No highlights have changed since last sync (${lastSyncTime.toLocaleString()})`);
       return;
     }
     println(`Syncing ${hs.length} highlights to readwise...`);
@@ -59,7 +72,11 @@ upload.onclick = async () => {
     println(`Uploading ${readwiseHighlights.length} highlights to Readwise.`);
     const result = await putHighlightsBatched(accessToken, readwiseHighlights, println)
     println('Successfully uploaded! See https://readwise.io/library')
-    println('Response:', result);
+    lastSyncTime = new Date();
+    localStorage.setItem(LastSyncTimeKey, lastSyncTime.toISOString());
+
+    // Uncomment for debugging
+    // println('Response:', result);
   } catch (err) {
     console.error('Failed to upload highlights', err);
     println('Failed to upload highlights', String(err));
