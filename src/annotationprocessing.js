@@ -59,6 +59,8 @@ export function assembleHighlights(annotations, contents) {
       }
       return {
         id,
+        created: new Date(a.created),
+        updated: new Date(a.lastUpdated),
         source,
         fullMd,
         highlightMd,

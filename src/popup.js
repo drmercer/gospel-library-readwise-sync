@@ -43,6 +43,7 @@ upload.onclick = async () => {
 
     /** @type {(import('./readwise/api.js').Highlight)[]} */
     const readwiseHighlights = hs.map(h => ({
+      highlighted_at: h.created.toISOString(),
       highlight_url: 'https://www.churchofjesuschrist.org/notes?lang=eng&note=' + encodeURIComponent(h.id),
       text: h.highlightMd,
       source_url: h.source?.url,
