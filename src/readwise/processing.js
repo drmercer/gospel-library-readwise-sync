@@ -13,9 +13,11 @@
  */
 export function makeReadwiseNote(noteMd = '', tags = []) {
   return (
-    tags.map(tag => {
-      const cleanedTag = tag.replace(/\s+/g, '_').toLowerCase();
-      return `.gl_${cleanedTag}`;
-    }).concat(['.gl']).join(' ') + '\n\n' + noteMd
+    tags.map(cleanTag).concat(['.gl']).join(' ') + '\n\n' + noteMd
   ).trim();
+}
+
+export function cleanTag(tag) {
+  const cleanedTag = tag.replace(/[\s.]+/g, '_').toLowerCase();
+  return `.gl_${cleanedTag}`;
 }
