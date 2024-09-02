@@ -167,6 +167,10 @@ function htmlToMarkdownWithPlaceholders(html) {
         return `🌌${md}🌌`;
       },
     }
+  }, {
+    // Readwise only supports a subset of Markdown, and requires asterisks to be used
+    emDelimiter: '*',
+    strongDelimiter: '**',
   });
 }
 
