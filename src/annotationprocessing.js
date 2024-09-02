@@ -184,6 +184,9 @@ function withoutPlaceholders(md) {
 }
 
 function noteToMarkdown(noteHtml) {
-  return turndown(noteHtml)
+  return turndown(noteHtml, {}, {
+    emDelimiter: '*',
+    strongDelimiter: '**',
+  })
     .replace(/\n\s+\n/g, '\n\n') // remove extra blank lines
 }
