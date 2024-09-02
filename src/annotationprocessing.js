@@ -157,13 +157,15 @@ function htmlToMarkdownWithPlaceholders(html) {
       replacement: () => '🌌🦶🌌',
     },
     // for links, add fake word separators around them, because that's how word counting works.
-    // also filter out footnote links
+    // also filter out footnote links, and expand links within GL
     'add-fake-word-separator-after-links': {
       filter: 'a',
       replacement: (content, node) => {
-        const href = node.getAttribute('href');
-        const isFootnote = href?.startsWith('#');
-        const md = (isFootnote || !href) ? content : `[${content}](${href})`;
+        const rawHref = node.getAttribute('href') || '';
+        const fullHref = rawHref.startsWith('/') ? `https://www.churchofjesuschrist.org/study${rawHref}` :
+          rawHref.startsWith('#') ? '' :
+            rawHref;
+        const md = (!fullHref) ? content : `[${content}](${fullHref})`;
         return `🌌${md}🌌`;
       },
     }
