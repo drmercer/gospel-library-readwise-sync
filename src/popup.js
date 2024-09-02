@@ -104,6 +104,7 @@ clearCache.onclick = () => {
 resetLastSync.onclick = () => {
   output.textContent = '';
   localStorage.removeItem(LastSyncTimeKey);
+  lastSyncTime = undefined;
   println(`Cleared last sync time`);
 }
 
