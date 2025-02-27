@@ -29,6 +29,8 @@ export function assembleHighlights(annotations, contents) {
         return c
       });
       const source = contentObjs[0] ? getSourceInfo(a, contentObjs[0]) : undefined;
+      const sourceLink = uris[0] ? uriToUrl(uris[0]) : undefined;
+      const sourceMd = sourceLink && `\n\n[Source](${sourceLink})`;
       const mdParts = contentObjs
         .flatMap(c => c.content)
         .map(c => c.markup)
@@ -50,7 +52,7 @@ export function assembleHighlights(annotations, contents) {
       })
         .map(withoutPlaceholders)
         .map(s => s.trim())
-        .join('\n\n');
+        .join('\n\n') + sourceMd;
       const noteMd = a.note?.content ? noteToMarkdown(a.note.content) : undefined;
       /** @type {string[]} tags */
       const tags = a.tags?.map(t => t.name) ?? [];
@@ -110,7 +112,7 @@ const knownSources = [
 ]
 
 function getSourceInfo(annotation, contentObj) {
-  const url = 'https://www.churchofjesuschrist.org/study' + annotation.uri;
+  const url = uriToUrl(annotation.uri);
   // check for known sources first - this groups BoM citations into one source, for example
   const source = knownSources.find(s => url.startsWith(s.url));
   if (source) {
@@ -123,6 +125,10 @@ function getSourceInfo(annotation, contentObj) {
     author,
     title,
   };
+}
+
+function uriToUrl(uri) {
+  return 'https://www.churchofjesuschrist.org/study' + uri;
 }
 
 function wordOffsetToIndex(wordsAndSeparators, wordOffset) {

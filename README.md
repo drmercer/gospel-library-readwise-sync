@@ -12,7 +12,7 @@ Chrome-based browsers:
 4. Click "Load unpacked"
 5. Select the repo directory
 
-Firefox: Not yet supported. Someday I will take time to bundle an extension package for Firefox.
+Firefox: Not yet supported. Someday I might take time to bundle an extension package for Firefox.
 
 Safari: Not supported. I don't have a Mac, so I can't publish for Safari.
 
@@ -25,4 +25,5 @@ The extension will remember the last successful sync time. On later syncs, it wi
 ## Developing
 
 * See [`popup.js`](./src/popup.js) for the main logic of the code. See [`popup.html`](./src/popup.html) for the UI.
+* See [`annotationprocessing.js`](./src/annotationprocessing.js) for the mapping logic that derives highlight objects from annotation objects.
 * See [here for Readwise's API docs](https://readwise.io/api_deets).
