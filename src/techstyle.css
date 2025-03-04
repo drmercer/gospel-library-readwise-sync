@@ -1,0 +1,268 @@
+/**
+@see https://techstyle.danmercer.net/
+
+@license
+
+MIT License
+
+Copyright (c) 2025 Dan Mercer
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+*/
+
+@layer techstyle_base {
+  * {
+    accent-color: var(--color);
+    /* TODO what to use for the tap color / :active style */
+    -webkit-tap-highlight-color: transparent;
+    box-sizing: border-box;
+  }
+
+  html {
+    /* TODO why does overriding these only work if applied to `html`? */
+    --default-width: clamp(350px, 60vw, 700px);
+    --spacing-within: 5px;
+    --spacing-around: calc(4 * var(--spacing-within));
+    --hue: 266;
+    --color: oklch(0.56 0.19 var(--hue));
+    --bg-color: white;
+    color: var(--color);
+    background-color: var(--bg-color, white);
+    font-family: system-ui, sans-serif;
+  }
+
+  .t-dark {
+    --color: oklch(0.8 0.19 var(--hue));
+    --bg-color: #222;
+    color-scheme: dark;
+  }
+
+  .t-swapped {
+    --color: black;
+    --bg-color: oklch(0.8 0.19 var(--hue));
+  }
+
+  .t-swapped.t-dark {
+    --color: white;
+    --bg-color: oklch(0.45 0.19 var(--hue));
+  }
+
+  body {
+    min-height: 100vh;
+    min-height: 100svh;
+    margin: 0;
+    padding-inline: var(--spacing-around);
+    line-height: 1.4;
+  }
+
+  body > :not(header, footer) {
+    width: 100%;
+    max-width: var(--default-width);
+    margin: 0 auto;
+  }
+
+  header,
+  footer {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--spacing-around);
+
+    /* center an only child */
+    &:has(> :only-child) {
+      justify-content: center;
+    }
+  }
+  main ~ footer {
+    /* sticky footer - always at bottom of page even if there's not enough content to push it there */
+    position: sticky;
+    top: 100vh;
+    top: 100svh;
+  }
+
+  form,
+  section,
+  p {
+    margin-block: var(--spacing-around);
+  }
+
+  a {
+    color: inherit;
+    text-decoration-line: underline;
+    text-decoration-thickness: 2px;
+
+    &:active {
+      text-decoration-thickness: 3px;
+    }
+  }
+
+  iframe {
+    border: none;
+    width: 100%;
+    min-height: min(65svh, 400px);
+  }
+
+  /* === form elements === */
+
+  *:focus-visible {
+    outline: 2px dashed var(--color);
+    outline-offset: 2px;
+    border-radius: var(--spacing-within);
+  }
+
+  button, input[type=submit] {
+    appearance: none;
+    background: none;
+    font: inherit;
+    color: inherit;
+    border: 2px solid currentColor;
+    border-radius: var(--spacing-within);
+    padding: var(--spacing-within) calc(2 * var(--spacing-within));
+    cursor: pointer;
+    position: relative;
+  }
+  button {
+    /* The real border is on a pseudoelement, which animates when clicked. That avoids changing the actual hit box of the button. */
+    /* Sadly, can't do this on input[type=submit] because inputs aren't containers so pseudoelements don't work */
+    border: 2px solid transparent;
+
+    &::before {
+      content: '\200b';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      border: inherit;
+      border-radius: inherit;
+      border-color: currentColor;
+      transition: transform 25ms ease-in;
+    }
+    &:active::before {
+      transform: scale(0.92);
+    }
+  }
+
+  /* I wish there was a cleaner way to do this... */
+  input[type=text],
+  input[type=password],
+  input[type=email],
+  input[type=number],
+  input[type=search],
+  input[type=tel],
+  input[type=url] {
+    appearance: none;
+    color: inherit;
+    background: inherit;
+    border: 1px solid currentColor;
+    padding: var(--spacing-within);
+    border-radius: var(--spacing-within);
+    border-left-width: 0;
+    border-right-width: 0;
+  }
+}
+
+@layer techstyle_components {
+  /* === custom elements === */
+
+  .t-card {
+    display: block;
+    margin-block: 20px;
+    border: 2px solid currentColor;
+    border-radius: var(--spacing-within);
+    padding: var(--spacing-within);
+    position: relative;
+    /* when it's supported, add margin-trim: block */
+
+    > :first-child {
+      margin-top: 0;
+    }
+
+    > :last-child {
+      margin-bottom: 0;
+    }
+
+    &[aria-label] {
+      /* extra padding to accommodate the title psuedo-element */
+      padding-top: calc(var(--spacing-within) + 0.5em);
+    }
+    &[aria-label]::before {
+      position: absolute;
+      top: calc(-0.5em - var(--spacing-within));
+      content: attr(aria-label);
+      background: var(--bg-color, white);
+      padding-inline: 2px;
+    }
+
+    /* list of cards */
+    list-style: none;
+  }
+
+  /* list of cards */
+  ul:has(> .t-card) {
+    padding: 0;
+  }
+}
+
+@layer techstyle_utils {
+  .t-sidebyside {
+    margin: var(--spacing-around) 0;
+
+    /* Full-width, with some "padding" */
+    /* (Using width:100vw and actual padding causes a horizontal scrollbar - not sure why...) */
+    width: calc(100vw - 2 * var(--spacing-around));
+    position: relative;
+    left: 50%;
+    transform: translateX(-50%);
+
+    /* Arrange contents side-by-side */
+    display: flex;
+    justify-content: center;
+    gap: var(--spacing-around);
+    flex-wrap: wrap;
+
+    & > * {
+      max-width: clamp(350px, 60vw, 500px);
+      margin: 0; /* no margin because gap takes care of it */
+      flex: 1 1 350px;
+    }
+  }
+
+  .t-fullheight {
+    min-height: 100svh;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+
+    /* If no header, put a pseudoelement in that spot in the flex arrangement */
+    &:not(:has(> header:first-child))::before {
+      content: '\200b';
+      width: 0;
+      height: 0;
+    }
+
+    /* If no footer, put a pseudoelement in that spot in the flex arrangement */
+    &:not(:has(> footer:last-child))::after {
+      content: '\200b';
+      width: 0;
+      height: 0;
+    }
+  }
+}
