@@ -1,0 +1,435 @@
+/**
+@see https://techstyle.danmercer.net/
+
+@license
+
+MIT License
+
+Copyright (c) 2025 Dan Mercer
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+*/
+
+@layer techstyle {
+
+  @view-transition {
+    navigation: auto;
+  }
+
+  /* See https://www.gfor.rest/blog/making-pwas-feel-native#overscroll-behavior */
+  @media (display-mode: standalone) {
+    html,
+    body {
+      overscroll-behavior: none;
+    }
+  }
+
+  /* === theme === */
+
+  * {
+    accent-color: var(--t-color-fg);
+    /* default tap highlight color is based on the hue */
+    -webkit-tap-highlight-color: oklch(0.56 0.19 var(--t-hue) / .3);
+    /* this makes so many little things easier */
+    box-sizing: border-box;
+  }
+
+  html {
+    /* TODO why does overriding these only work if applied to `html`? */
+    --t-spacing-within: 5px;
+    --t-spacing-around: calc(4 * var(--t-spacing-within));
+    --t-hue: 266;
+    --t-color-fg: oklch(0.56 0.19 var(--t-hue));
+    --t-color-bg: white;
+    color: var(--t-color-fg);
+    background-color: var(--t-color-bg);
+    font-family: system-ui, sans-serif;
+
+    /* avoids runaway text lines */
+    word-wrap: break-word;
+    hyphens: auto;
+    box-decoration-break: clone;
+
+    --t-scrollbar-width: calc(2 * var(--t-spacing-within));
+    /* prevents headers/footers from causing horizontal scroll */
+    overflow-x: clip;
+    scroll-behavior: smooth;
+  }
+
+  .t-dark {
+    --t-color-fg: oklch(0.8 0.19 var(--t-hue));
+    --t-color-bg: #222;
+    color-scheme: dark;
+  }
+
+  .t-swapped {
+    --t-color-fg: black;
+    --t-color-bg: oklch(0.8 0.19 var(--t-hue));
+  }
+
+  .t-swapped.t-dark {
+    --t-color-fg: white;
+    --t-color-bg: oklch(0.45 0.19 var(--t-hue));
+  }
+
+  /* scrollbar styles */
+  body::-webkit-scrollbar {
+    width: var(--t-scrollbar-width);
+  }
+  body::-webkit-scrollbar-thumb {
+    background: var(--t-color-fg);
+    border-radius: 4px;
+    border: 2px solid var(--t-color-bg);
+  }
+  body::-webkit-scrollbar-track {
+    background: var(--t-color-bg);
+  }
+  @supports not selector(::-webkit-scrollbar) {
+    :root {
+      /* for header width calculations */
+      --t-scrollbar-width: 0;
+      scrollbar-color: var(--t-color-fg) var(--t-color-bg);
+    }
+  }
+
+  /* === base classless styles === */
+
+  :target {
+    scroll-margin: var(--t-spacing-around);
+  }
+
+  body {
+    margin: 0;
+    padding-inline: var(--t-spacing-around);
+    line-height: 1.4;
+
+    /* when it's supported, add margin-trim: block */
+    > :first-child {
+      margin-top: 0;
+    }
+    > :last-child {
+      margin-bottom: 0;
+    }
+  }
+
+  body > :not(header, footer) {
+    width: 100%;
+    /* Apply max-width everywhere (except some elements escape this - see "full width" snippets) */
+    max-width: clamp(350px, 60vw, 700px);
+    margin-inline: auto;
+  }
+
+  header,
+  footer {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+
+    /* Make footers/headers full-page, unless they have a container */
+    &:not(.t-sidebyside *, .t-card *, dialog *) {
+      /* Full-width, with some padding (.t-sidebyside also does this) */
+      /* 100vw includes the scrollbar width, so we have to subtract it here. Plus we have overflow-x:clip just in case. */
+      width: max(calc(100vw - var(--t-scrollbar-width)), 100%);
+      position: relative;
+      left: 50%;
+      transform: translateX(-50%);
+
+      padding: var(--t-spacing-around) calc(2 * var(--t-spacing-around));
+    }
+
+    /* center an only child */
+    &:has(> :only-child) {
+      justify-content: center;
+    }
+  }
+
+  form,
+  p,
+  hr {
+    margin-block: var(--t-spacing-around);
+  }
+
+  hr {
+    border: none;
+    border-bottom: 2px solid currentColor;
+  }
+
+  pre {
+    white-space: pre-wrap;
+  }
+
+  /* sections have margin when they have siblings */
+  * + section {
+    margin-top: calc(2 * var(--t-spacing-around));
+  }
+  section:has(+ *) {
+    margin-bottom: calc(2 * var(--t-spacing-around));
+  }
+
+  /* === form elements === */
+
+  *:focus-visible {
+    outline: 2px dashed var(--t-color-fg);
+    outline-offset: 2px;
+    border-radius: var(--t-spacing-within);
+  }
+
+  /* Button inputs */
+  button,
+  select,
+  input[type=submit],
+  input::file-selector-button {
+    appearance: none;
+    background: none;
+    font: inherit;
+    font-size: inherit;
+    color: inherit;
+    --border-width: 2px;
+    border: var(--border-width) solid currentColor;
+    border-radius: var(--t-spacing-within);
+    padding: var(--t-spacing-within) calc(2 * var(--t-spacing-within));
+    cursor: pointer;
+    position: relative;
+
+    fieldset & + & {
+      border-inline-start-width: 0;
+    }
+
+    @media (prefers-reduced-motion) {
+      &:active {
+        text-decoration: underline;
+      }
+    }
+  }
+  /* animate buttons/selects when clicked */
+  @media not (prefers-reduced-motion) {
+    button,
+    select {
+      /* The real border is on a pseudoelement, which animates when clicked. That avoids changing the actual hit box of the button. */
+      /* Sadly, can't do this on input[type=submit] because inputs aren't containers so pseudoelements don't work */
+      border: var(--border-width) solid transparent;
+      /* no tab highlight because :active takes care of that */
+      -webkit-tap-highlight-color: transparent;
+
+      &::before {
+        content: '\200b';
+        position: absolute;
+        /* inset is relative to the content box, not the border box, so we have to correct it */
+        inset: calc(var(--border-width) * -1);
+        border: inherit;
+        border-radius: inherit;
+        border-color: currentColor;
+        transition: scale 25ms ease-in;
+      }
+      &:active::before {
+        scale: 0.92;
+      }
+      /* TODO hover styles? */
+    }
+  }
+
+  /* Text inputs */
+  /* (I wish there was a cleaner way to do this...) */
+  input[type=text],
+  input[type=password],
+  input[type=email],
+  input[type=number],
+  input[type=search],
+  input[type=tel],
+  input[type=url],
+  textarea {
+    appearance: none;
+    color: inherit;
+    background: inherit;
+    font: inherit;
+    font-family: monospace;
+    border: 1px solid currentColor;
+    padding: var(--t-spacing-within);
+    border-radius: var(--t-spacing-within);
+    border-left-width: 0;
+    border-right-width: 0;
+    width: 100%;
+
+    &::placeholder {
+      color: inherit;
+      opacity: .8;
+      font-style: italic;
+    }
+
+    fieldset & {
+      flex: 1;
+    }
+  }
+
+  textarea {
+    field-sizing: content;
+    resize: none;
+  }
+
+  fieldset {
+    border: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    /* TODO if I want to do this, I'll need to figure something out with borders... */
+    /* justify-content: space-between;
+    align-items: stretch; */
+
+    > :not(:last-child) {
+      border-start-end-radius: 0;
+      border-end-end-radius: 0;
+    }
+    > :not(:first-child) {
+      border-start-start-radius: 0;
+      border-end-start-radius: 0;
+    }
+  }
+
+  /* === interactive elements === */
+
+  ::selection {
+    /* Brave for Android had (has?) a bug where CSS vars don't work in ::selection, hence the defaults here */
+    color: var(--t-color-bg, white);
+    background-color: var(--t-color-fg, #888);
+  }
+
+  a {
+    color: inherit;
+    text-decoration-line: underline;
+    text-decoration-thickness: 2px;
+
+    /* no tab highlight because :active takes care of that */
+    -webkit-tap-highlight-color: transparent;
+    &:active {
+      text-decoration-thickness: 3px;
+    }
+    /* TODO hover styles? */
+  }
+
+  iframe {
+    border: none;
+    width: 100%;
+    min-height: min(65svh, 400px);
+  }
+
+  dialog, [popover] {
+    width: 300px;
+    max-width: 80%;
+    background-color: var(--t-color-bg);
+  }
+  dialog::backdrop {
+    background-color: var(--t-color-bg);
+    opacity: 0.9;
+  }
+
+  summary {
+    cursor: pointer;
+  }
+
+  /* === custom elements === */
+
+  .t-card {
+    display: block;
+    margin-block: 20px;
+    position: relative;
+
+    /* list of cards */
+    list-style: none;
+  }
+  .t-card, dialog, [popover] {
+    color: inherit;
+    border: 2px solid currentColor;
+    border-radius: var(--t-spacing-within);
+    padding: var(--t-spacing-within);
+
+    /* when it's supported, add margin-trim: block */
+    > :first-child {
+      margin-top: 0;
+    }
+    > :last-child {
+      margin-bottom: 0;
+    }
+
+    &[aria-label] {
+      /* extra padding to accommodate the title psuedo-element */
+      padding-top: calc(var(--t-spacing-within) + 0.5lh);
+    }
+    &[aria-label]::before {
+      position: absolute;
+      top: calc(-0.5lh - var(--t-spacing-within));
+      content: attr(aria-label);
+      background: var(--t-color-bg);
+      padding-inline: 2px;
+    }
+  }
+
+  /* list of cards */
+  ul:has(> .t-card) {
+    padding: 0;
+  }
+
+  /* === layouts === */
+
+  .t-sidebyside {
+    margin: var(--t-spacing-around) 0;
+
+    /* Full-width, with some padding (.t-sidebyside also does this) */
+    /* 100vw includes the scrollbar width, so we have to subtract it here. Plus we have overflow-x:clip just in case. */
+    width: max(calc(100vw - var(--t-scrollbar-width)), 100%);
+    position: relative;
+    left: 50%;
+    transform: translateX(-50%);
+    padding-inline: var(--t-spacing-around);
+
+    /* Arrange contents side-by-side */
+    display: flex;
+    justify-content: center;
+    gap: var(--t-spacing-around);
+    flex-wrap: wrap;
+
+    & > * {
+      max-width: clamp(350px, 60vw, 500px);
+      margin: 0; /* no margin because gap takes care of it */
+      flex: 1 1 350px;
+    }
+  }
+
+  .t-fullheight {
+    min-height: 100svh;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+
+    /* If no header, put a pseudoelement in that spot in the flex arrangement */
+    &:not(:has(> header:first-child))::before {
+      content: '\200b';
+      width: 0;
+      height: 0;
+    }
+
+    /* If no footer, put a pseudoelement in that spot in the flex arrangement */
+    &:not(:has(> footer:last-child))::after {
+      content: '\200b';
+      width: 0;
+      height: 0;
+    }
+  }
+}
