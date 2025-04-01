@@ -3,7 +3,7 @@ import { LoginRequiredError, getAllAnnotations, getContents } from "./annotation
 import { putHighlightsBatched } from "./readwise/api.js";
 import { chunks } from "./utils/array.js";
 import { runTests } from "./tests/runner.js";
-import { makeReadwiseNote } from "./readwise/processing.js";
+import { cleanMd, makeReadwiseNote } from "./readwise/processing.js";
 
 const [output] = document.querySelectorAll('pre');
 const [sync, changeReadwiseToken, clearCache, resetLastSync, createTestCase, runTestsBtn] = document.querySelectorAll('button');
@@ -62,7 +62,7 @@ sync.onclick = async () => {
     const readwiseHighlights = hs.map(h => ({
       highlighted_at: h.created.toISOString(),
       highlight_url: 'https://www.churchofjesuschrist.org/notes?lang=eng&note=' + encodeURIComponent(h.id),
-      text: h.highlightMd,
+      text: cleanMd(h.highlightMd),
       source_url: h.source?.url,
       author: h.source?.author,
       title: h.source?.title,

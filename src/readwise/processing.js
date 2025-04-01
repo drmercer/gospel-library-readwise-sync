@@ -21,3 +21,15 @@ export function cleanTag(tag) {
   const cleanedTag = tag.replace(/[\s.]+/g, '_').toLowerCase();
   return `.gl_${cleanedTag}`;
 }
+
+export function cleanMd(md) {
+  return (
+    md
+      // Readwise incorrectly handles links like ([this](foo)) - it thinks the paren is part of the link. So we fix it by adding a space before the second paren.
+      .replace(/\)\)/g, ') )')
+      // It also doesn't handle escapes like \[ or \], so we just remove the backslashes
+      .replace(/\\\]\(/g, '] (')
+      .replace(/\\\[/g, '[')
+      .replace(/\\\]/g, ']')
+  );
+}
